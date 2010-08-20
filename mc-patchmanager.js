@@ -44,17 +44,59 @@ var blockSize = 64;
 
 function makeBootDataBlockMessage(data, offset) {
     var length = Math.min(blockSize, data.length - offset);
-    return
-        'f0 00 13 41 01 '
+
+    var checksum = 0x01
+        ^ length
+        ^ ((offset >> 21) & 0x7f)
+        ^ ((offset >> 14) & 0x7f)
+        ^ ((offset >> 7) & 0x7f)
+        ^ (offset & 0x7f);
+
+    function encodeBinary(data) {
+        var encoded = [];
+        for (var i = 0; i < data.length; i += 7) {
+            var highBitPos = encoded.length;
+            encoded.push(0);
+            var mask = 1;
+            map(function (byte) {
+                    if (byte & 0x80) {
+                        encoded[highBitPos] |= mask;
+                    }
+                    mask <<= 1;
+                    encoded.push(byte & 0x7f);
+                }, data.slice(i, i + 7));
+        }
+        map(function (byte) { checksum ^= byte; }, encoded);
+        return ''.concat.apply('', map(encode7Bits, encoded));
+    }
+
+    return 'f0 00 13 41 01 '
         + encode7Bits(length) + ' '
         + encode28Bits(offset) + ' '
-        + ''.concat.apply('', map(encode7Bits, data.slice(offset, offset + length))) + ' '
-        + encode7Bits(0) + ' ' // fixme checksum
+        + encodeBinary(data.slice(offset, offset + length)) + ' '
+        + encode7Bits(checksum) + ' '
         + 'f7';
 }
-    
-    
+
+function uploadFirmware(hexData) {
+    var firmware = decodeHexFile(hexData);
+    if (firmware.length % 256) {
+        firmware.push.apply(firmware, list(repeat(0xff, 256 - (firmware.length % 256))));
+    }
+
+    for (var i = 0; i < firmware.length; i += 64) {
+        log(makeBootDataBlockMessage(firmware, i));
+    }
+
+    var checksum = 0;
+    map(function (byte) { checksum += byte; }, firmware);
+
+    log('f0 00 13 41 03 '
+        + encode21Bits(firmware.length)
+        + ' ' + encode14Bits(checksum & 0x3fff)
+        + ' f7');
+}
 
 function getHexFile() {
-    $.get('mididata.hex', decodeHexFile);
+    $.get('mididata.hex', uploadFirmware);
 }
