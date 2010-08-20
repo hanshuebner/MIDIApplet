@@ -1,14 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>BCx2000 Editor</title>
+    <title>MiniCommand Patch Manager</title>
     <script type="text/javascript" src="MochiKit/MochiKit.js"> </script>
     <script type="text/javascript" src="jquery-1.4.2.min.js"> </script>
     <script type="text/javascript" src="jquery.cookie.js"> </script>
     <script type="text/javascript" src="save-state.js"> </script>
     <script type="text/javascript" src="log.js"> </script>
     <script type="text/javascript" src="midi-utils.js"> </script>
-    <script type="text/javascript" src="bcx-edit.js"> </script>
+    <script type="text/javascript" src="mc-patchmanager.js"> </script>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
   </head>
   <body>
@@ -19,17 +18,8 @@
 	<label for="output">Output:</label><select id="outputSelect"><option></option></select><br/>
       </fieldset>
       <fieldset>
-	<legend>BCx Configuration</legend>
-	<textarea id="config"> </textarea>
-	<button disabled="disabled" id="submitConfig">Send to BCx</button>
-      </fieldset>
-      <fieldset>
-	<legend>Action</legend>
-        <label for="message">Sysex:</label>
-        f0 00 20 32 7f 7f <input id="midiMessage" size="15" value=""/> f7
-        <div class="comment">(Input BCx command in hex)</div>
-        <br/>
-	<button id="submitMessage" type="submit">Send to BCx</button>
+        <legend>Patch data</legend>
+        <div id="hexData"></div>
       </fieldset>
       <fieldset>
 	<legend>Log</legend>

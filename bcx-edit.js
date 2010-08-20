@@ -4,10 +4,6 @@ var applet;
 var parameterNumber;
 var parameterValue;
 
-function addToLog(message) {
-    $("#log").append(message + "<br/>");
-}
-
 function decodeBinaryData(buf) {
     var retval = [];
     addToLog("length of data: " + buf.length);
@@ -95,16 +91,12 @@ function midiMessageReceived(message) {
     addToLog(message);
 }
 
-function fourteenBitsToHex(number) {
-    return (((number & (0x7f << 7)) << 1) | (number & 0x7f) | 0x10000).toString(16).substr(-4, 4);
-}
-
 function uploadConfiguration()
 {
     try {
         var lineNumber = 0;
         map(function (string) {
-            applet.send('f0 00 20 32 00 15 20' + fourteenBitsToHex(lineNumber++) + stringToHex(string) + 'f7');
+            applet.send('f0 00 20 32 00 15 20' + encode14Bits(lineNumber++) + stringToHex(string) + 'f7');
         }, $('#config').val().split(/\n/));
     }
     catch (e) {
@@ -120,31 +112,6 @@ function sendMidiMessage()
     catch (e) {
         addToLog('error sending: ' + e);
     }
-}
-
-function restoreStateFromCookie()
-{
-    if ($.cookie('state')) {
-        var state = evalJSON($.cookie('state'));
-        document.state = state;
-        for (var key in document.state) {
-            $('#' + key).val(state[key]).trigger('change');
-        }
-        document.state = state;
-    } else {
-        document.state = {};
-    }
-}
-
-function saveStateToCookie()
-{
-    $.cookie('state', serializeJSON(document.state));
-}
-
-function saveState(key, value)
-{
-    document.state[key] = value;
-    saveStateToCookie();
 }
 
 $(document).ready(function () {
