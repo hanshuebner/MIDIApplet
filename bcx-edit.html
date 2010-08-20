@@ -18,13 +18,13 @@
       <fieldset>
 	<legend>BCx Configuration</legend>
 	<textarea id="config"> </textarea>
-	<button disabled="disabled" id="submitConfig" type="submit">Send to BCx</button>
+	<button disabled="disabled" id="submitConfig">Send to BCx</button>
       </fieldset>
       <fieldset>
 	<legend>Action</legend>
-        <label for="message">Message:</label>
-        <input id="midiMessage" size="50" value="f0 00 20 32 7f 7f "/>
-        <div class="comment">(Input raw MIDI message in hex)</div>
+        <label for="message">Sysex:</label>
+        f0 00 20 32 7f 7f <input id="midiMessage" size="15" value=""/> f7
+        <div class="comment">(Input BCx command in hex)</div>
         <br/>
 	<button id="submitMessage" type="submit">Send to BCx</button>
       </fieldset>

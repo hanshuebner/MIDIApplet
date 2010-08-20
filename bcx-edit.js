@@ -115,7 +115,7 @@ function uploadConfiguration()
 function sendMidiMessage()
 {
     try {
-        applet.send($('#midiMessage').val());
+        applet.send('f0 00 20 32 7f 7f ' + $('#midiMessage').val() + ' f7');
     }
     catch (e) {
         addToLog('error sending: ' + e);
