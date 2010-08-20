@@ -5,7 +5,7 @@ var parameterNumber;
 var parameterValue;
 
 function addToLog(message) {
-    $("#log")[0].innerHTML += message + "<br/>";
+    $("#log").append(message + "<br/>");
 }
 
 function decodeBinaryData(buf) {
@@ -58,41 +58,41 @@ function midiMessageReceived(message) {
         } else {
             addToLog(message);
         }
-    } else {
-        var match = message.match(/^f0 01 26 02 .. .. (.*) f7 $/);
-        if (match) {
-            var data = decodeBinaryData(match[1]);
-            addToLog("program dump: " + data);
-            return;
-        }
-        var match = message.match(/^f0 00 20 32 00 15 20 (..) (..) (.*) f7 $/);
-        if (match) {
-            var lineNumber = (parseInt(match[1], 16) << 7) | parseInt(match[2], 16);
-            var text = hexToString(match[3]);
-            if (lineNumber != nextLineNumber) {
-                addToLog("line number error, wanted " + nextLineNumber + " got " + lineNumber);
-                nextLineNumber = lineNumber;
-            }
-            nextLineNumber++;
-            config += text + "\n";
-            if (text == '$end') {
-                $('#config').html(config);
-                config = '';
-                nextLineNumber = 0;
-            }
-            return;
-        }
-        var match = message.match(/^f0 00 20 32 00 15 21 (..) (..) (..) f7 $/);
-        if (match) {
-            var lineNumber = (parseInt(match[1], 16) << 7) | parseInt(match[2], 16);
-            var status = match[3];
-            if (parseInt(status, 16)) {
-                addToLog("Error in line " + lineNumber);
-            }
-            return;
-        }
-        addToLog(message);
+        return;
     }
+    var match = message.match(/^f0 01 26 02 .. .. (.*) f7 $/);
+    if (match) {
+        var data = decodeBinaryData(match[1]);
+        addToLog("program dump: " + data);
+        return;
+    }
+    var match = message.match(/^f0 00 20 32 00 15 20 (..) (..) (.*) f7 $/);
+    if (match) {
+        var lineNumber = (parseInt(match[1], 16) << 7) | parseInt(match[2], 16);
+        var text = hexToString(match[3]);
+        if (lineNumber != nextLineNumber) {
+            addToLog("line number error, wanted " + nextLineNumber + " got " + lineNumber);
+            nextLineNumber = lineNumber;
+        }
+        nextLineNumber++;
+        config += text + "\n";
+        if (text == '$end') {
+            $('#config').html(config);
+            config = '';
+            nextLineNumber = 0;
+        }
+        return;
+    }
+    var match = message.match(/^f0 00 20 32 00 15 21 (..) (..) (..) f7 $/);
+    if (match) {
+        var lineNumber = (parseInt(match[1], 16) << 7) | parseInt(match[2], 16);
+        var status = match[3];
+        if (parseInt(status, 16)) {
+            addToLog("Error in line " + lineNumber);
+        }
+        return;
+    }
+    addToLog(message);
 }
 
 function fourteenBitsToHex(number) {
@@ -112,6 +112,41 @@ function uploadConfiguration()
     }
 }
 
+function sendMidiMessage()
+{
+    try {
+        applet.send($('#midiMessage').val());
+    }
+    catch (e) {
+        addToLog('error sending: ' + e);
+    }
+}
+
+function restoreStateFromCookie()
+{
+    if ($.cookie('state')) {
+        var state = evalJSON($.cookie('state'));
+        document.state = state;
+        for (var key in document.state) {
+            $('#' + key).val(state[key]).trigger('change');
+        }
+        document.state = state;
+    } else {
+        document.state = {};
+    }
+}
+
+function saveStateToCookie()
+{
+    $.cookie('state', serializeJSON(document.state));
+}
+
+function saveState(key, value)
+{
+    document.state[key] = value;
+    saveStateToCookie();
+}
+
 $(document).ready(function () {
     applet = document.applets[0];
     
@@ -124,16 +159,20 @@ $(document).ready(function () {
     showPorts('input', applet.getInputs());
     $('#inputSelect').change(function () {
         applet.openInput($(this).val(), "midiMessageReceived");
+        saveState($(this).attr('id'), $(this).val());
     });
 
     showPorts('output', applet.getOutputs());
     $('#outputSelect').change(function () {
         applet.openOutput($(this).val());
-        applet.send('f0 00 20 32 7f 7f 40 00 f7');
-        $('#submit')
+        saveState($(this).attr('id'), $(this).val());
+        $('#submitConfig')
             .attr('disabled', '')
             .click(uploadConfiguration);
+        $('#submitMessage')
+            .click(sendMidiMessage);
     });
-    
+
+    restoreStateFromCookie();
 });
 

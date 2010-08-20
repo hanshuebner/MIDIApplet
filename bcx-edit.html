@@ -4,6 +4,7 @@
     <title>Java MIDI test</title>
     <script type="text/javascript" src="MochiKit/MochiKit.js"> </script>
     <script type="text/javascript" src="jquery-1.4.2.min.js"> </script>
+    <script type="text/javascript" src="jquery.cookie.js"> </script>
     <script type="text/javascript" src="bcx-edit.js"> </script>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
   </head>
@@ -17,11 +18,18 @@
       <fieldset>
 	<legend>BCx Configuration</legend>
 	<textarea id="config"> </textarea>
+	<button disabled="disabled" id="submitConfig" type="submit">Send to BCx</button>
       </fieldset>
       <fieldset>
 	<legend>Action</legend>
-	<button disabled="disabled" id="submit" type="submit">Send to BCx</button>
+        <label for="message">Message:</label>
+        <input id="midiMessage" size="50" value="f0 00 20 32 7f 7f "/>
+        <div class="comment">(Input raw MIDI message in hex)</div>
         <br/>
+	<button id="submitMessage" type="submit">Send to BCx</button>
+      </fieldset>
+      <fieldset>
+	<legend>Log</legend>
         <div id="log">
         </div>
       </fieldset>
