@@ -23,3 +23,35 @@ function encode28Bits(number) {
     return encode14Bits(number >> 14) + encode14Bits(number & 0x2fff);
 }
 
+
+function initMidiPortSelectors(inputSelectorName, outputSelectorName, applet, handlerName) {
+
+    function showPorts(direction, ports) {
+        for (var i = 0; i < ports.length; i++) {
+            $('#' + direction + 'Select').append("<option>" + ports[i] + "</option>");
+        }
+    }
+    
+    showPorts('input', applet.getInputs());
+    $('#' + inputSelectorName).change(function () {
+        applet.openInput($(this).val(), handlerName);
+        saveState($(this).attr('id'), $(this).val());
+    });
+
+    showPorts('output', applet.getOutputs());
+    $('#' + outputSelectorName).change(function () {
+        applet.openOutput($(this).val());
+        saveState($(this).attr('id'), $(this).val());
+    });
+}
+
+function matchMidiMessage(message) {
+    for (var i = 1; i < arguments.length; i++) {
+        var match = message.match(arguments[i]);
+        if (match) {
+            arguments[i+1].apply(this, match.slice(1));
+            return;
+        }
+    }
+}
+            
