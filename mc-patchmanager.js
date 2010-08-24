@@ -72,7 +72,7 @@ function makeBootDataBlockMessage(data, offset) {
 
     return 'f0 00 13 41 01 '
         + encode7Bits(length) + ' '
-        + encode28Bits(offset) + ' '
+        + encode21Bits(offset) + ' '
         + encodeBinary(data.slice(offset, offset + length)) + ' '
         + encode7Bits(checksum) + ' '
         + 'f7';
@@ -80,23 +80,73 @@ function makeBootDataBlockMessage(data, offset) {
 
 function uploadFirmware(hexData) {
     var firmware = decodeHexFile(hexData);
+    // Pad firmware to 256 byte boundary to match flash page size
     if (firmware.length % 256) {
         firmware.push.apply(firmware, list(repeat(0xff, 256 - (firmware.length % 256))));
     }
 
+    document.firmware = [];
     for (var i = 0; i < firmware.length; i += 64) {
-        log(makeBootDataBlockMessage(firmware, i));
+        document.firmware.push(makeBootDataBlockMessage(firmware, i));
     }
 
     var checksum = 0;
     map(function (byte) { checksum += byte; }, firmware);
 
-    log('f0 00 13 41 03 '
-        + encode21Bits(firmware.length)
-        + ' ' + encode14Bits(checksum & 0x3fff)
-        + ' f7');
+    document.firmware.push('f0 00 13 41 03 '
+                           + encode21Bits(firmware.length)
+                           + ' ' + encode14Bits(checksum & 0x3fff)
+                           + ' f7');
+    document.firmware.push('f0 00 13 41 04 f7');
+
+    // Start boot loader.  It will send an ack which will in turn trigger the transfer.
+    applet.send('f0 00 13 41 05 f7');
 }
 
 function getHexFile() {
     $.get('mididata.hex', uploadFirmware);
 }
+
+function midiMessageReceived(message) {
+    matchMidiMessage(message,
+                     /^b. (..) (..)/, function (byte1, byte2) {
+                         if (byte1 == "63") {
+                             parameterNumber = parseInt(byte2, 16) << 7;
+                             parameterValue = 0;
+                         } else if (byte1 == "62") {
+                             parameterNumber |= parseInt(byte2, 16);
+                         } else if (byte1 == "06") {
+                             parameterValue = parseInt(byte2, 16) << 7;
+                         } else if (byte1 == "26") {
+                             parameterValue |= parseInt(byte2, 16);
+                             addToLog("NRPN " + parameterNumber + " => " + parameterValue);
+                         } else {
+                             addToLog(message);
+                         }
+                     },
+
+                     /^f0 00 13 41 02/, function () {
+                         if (document.firmware.length) {
+                             applet.send(document.firmware.shift());
+                         }
+                     },
+
+                     /^f0 00 13 41 10/, function () {
+                         document.firmware = [];
+                         addToLog('NAK received from boot loader, upload aborted');
+                     },
+
+                     /(.*)/, function (message) {
+                         addToLog("unmatched: " + message);
+                     });
+}
+
+$(document).ready(function () {
+    applet = document.applets[0];
+
+    document.firmware = [];
+
+    initMidiPortSelectors('inputSelect', 'outputSelect', applet, 'midiMessageReceived');
+    
+    restoreStateFromCookie();
+});
