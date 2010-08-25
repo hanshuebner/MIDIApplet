@@ -72,7 +72,7 @@ function makeBootDataBlockMessage(data, offset) {
 
     return 'f0 00 13 41 01 '
         + encode7Bits(length) + ' '
-        + encode21Bits(offset) + ' '
+        + encode28BitsLE(offset) + ' '
         + encodeBinary(data.slice(offset, offset + length)) + ' '
         + encode7Bits(checksum) + ' '
         + 'f7';
@@ -94,8 +94,8 @@ function uploadFirmware(hexData) {
     map(function (byte) { checksum += byte; }, firmware);
 
     document.firmware.push('f0 00 13 41 03 '
-                           + encode21Bits(firmware.length)
-                           + ' ' + encode14Bits(checksum & 0x3fff)
+                           + encode21BitsLE(firmware.length)
+                           + ' ' + encode14BitsLE(checksum & 0x3fff)
                            + ' f7');
     document.firmware.push('f0 00 13 41 04 f7');
 
