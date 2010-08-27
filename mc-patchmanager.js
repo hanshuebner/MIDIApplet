@@ -107,6 +107,26 @@ function getHexFile() {
     $.get('mididata.hex', uploadFirmware);
 }
 
+function getPatches() {
+    $.get('/patches/', function (data) {
+        data = evalJSON(data);
+        if (!data.patches) {
+            addToLog('no patches returned from server');
+            return;
+        }
+        addToLog(data.patches.length + " patches received from server");
+        map(function (patch) {
+            $('#patches').append(
+                $(DIV({ class: 'patch' },
+                      map(function (fieldName) {
+                          return DIV({ class: fieldName }, patch[fieldName]);
+                      }, ['title', 'author', 'last-modified-date', 'device-id', 'comment']),
+                      DIV({ class: 'tags' },
+                          map(partial(DIV, null), patch.tags || [])))));
+        }, data.patches);
+    });
+}
+          
 function midiMessageReceived(message) {
     matchMidiMessage(message,
                      /^b. (..) (..)/, function (byte1, byte2) {
@@ -149,4 +169,6 @@ $(document).ready(function () {
     initMidiPortSelectors('inputSelect', 'outputSelect', applet, 'midiMessageReceived');
     
     restoreStateFromCookie();
+
+    getPatches();
 });

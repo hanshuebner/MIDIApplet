@@ -26,7 +26,44 @@ div#log {
     overflow-x: hidden;
     overflow-y: scroll;
 }
-div.comment {
+#patches {
+    width: 100%;
+    height: 20em;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+.patch {
+    margin-bottom: 1em;
+}
+.patch div {
+    margin-left: 1em;
+}
+.patch .title {
+    margin-bottom: .3em;
+    margin-left: 0em;
+    font-size: 1.5em;
+}
+.patch .author, .patch .last-modified-date, .patch .device-id {
     display: inline;
+    padding: .2em;
+    font-size: 80%;
+}
+.patch .author:before {
+    content: "author: ";
+}
+.patch .last-modified-date:before {
+    content: "date: ";
+}
+.patch .device-id:before {
+    content: "device-id: ";
+}
+.patch .comment {
+    margin: .3em .3em .6em 1.3em;
+}
+.patch .tags div {
+    display: inline;
+    margin: .2em;
+    padding: .2em;
+    background-color: #eee;
     font-size: 80%;
 }
