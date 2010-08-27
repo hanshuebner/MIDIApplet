@@ -22,28 +22,33 @@ textarea {
 }
 div#log {
     width: 100%;
-    height: 10em;
+    height: 5em;
     overflow-x: hidden;
     overflow-y: scroll;
 }
 #patches {
     width: 100%;
-    height: 20em;
+    height: 30em;
     overflow-x: hidden;
     overflow-y: scroll;
 }
 .patch {
-    margin-bottom: 1em;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    margin-right: 1em;
 }
 .patch div {
     margin-left: 1em;
+}
+.patchHighlight {
+    background-color: #cee;
 }
 .patch .title {
     margin-bottom: .3em;
     margin-left: 0em;
     font-size: 1.5em;
+    display: inline;
 }
-.patch .author, .patch .last-modified-date, .patch .device-id {
+.patch .author, .patch .last-modified-date, .patch .device-id, .patch .tags {
     display: inline;
     padding: .2em;
     font-size: 80%;
@@ -60,10 +65,55 @@ div#log {
 .patch .comment {
     margin: .3em .3em .6em 1.3em;
 }
-.patch .tags div {
+.tag {
     display: inline;
+    float: right;
     margin: .2em;
-    padding: .2em;
-    background-color: #eee;
-    font-size: 80%;
+    padding: .2em .4em .2em .4em;
+    background-color: #ccc;
+}
+.selectedTag {
+    background-color: #ccf;
+}
+
+/* upload window */
+
+.modal-window {
+    position: absolute;
+    display: none;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid black;
+}
+
+.close-window-icon {
+    position: absolute;
+    z-index: 9100;
+    top: 2;
+    left: 2;
+}
+
+#upload-window {
+    width: 550px;
+    z-index: 9010;
+}
+
+#documentation-window {
+    width: 640px;
+    z-index: 9020;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#mask {
+    position: absolute;
+    z-index: 9000;
+    top: 0px;
+    left: 0px;
+    background-color: #000;
+    display: none;
+}
+
+#ajax-loader {
+    position: absolute;
 }

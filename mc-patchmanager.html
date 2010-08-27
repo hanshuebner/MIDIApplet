@@ -13,9 +13,8 @@
   <body>
     <form onsubmit="return false">
       <fieldset>
-	<legend>Select MIDI ports</legend>
-	<label for="input">Input:</label><select id="inputSelect"><option></option></select><br/>
-	<label for="output">Output:</label><select id="outputSelect"><option></option></select><br/>
+        <legend>Tags</legend>
+        <div id="tags"></div>
       </fieldset>
       <fieldset>
         <legend>Patches</legend>
@@ -27,6 +26,27 @@
         </div>
       </fieldset>
     </form>
+    <div id="upload-window" class="modal-window" top="1">
+      <img class="close-window-icon" src="/static/images/icon_close_16px.gif" width="16" height="16"/>
+      <form onsubmit="return false">
+        <fieldset>
+          <legend>Patch details</legend>
+          <div id="patch-details"></div>
+          <button id="show-documentation">Documentation</button>
+        </fieldset>
+        <fieldset>
+	  <legend>Upload patch to MiniCommand</legend>
+	  <label for="input">Input:</label><select id="inputSelect"><option></option></select><br/>
+	  <label for="output">Output:</label><select id="outputSelect"><option></option></select><br/>
+          <button id="upload-button" disabled="disabled">Upload</button>
+        </fieldset>
+      </form>
+    </div>
+    <div id="documentation-window" class="modal-window">
+      <img class="close-window-icon" src="/static/images/icon_close_16px.gif" width="16" height="16"/>
+      <div id="documentation"></div>
+    </div>
+    <div id="mask"><img id="ajax-loader" src="/static/images/ajax-loader.gif"/></div>
     <applet width="200" height="200" align="baseline" codebase="bin/" code="net.bknr.midi.MidiApplet.class">
     </applet>
   </body>
