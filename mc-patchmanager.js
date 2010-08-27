@@ -144,6 +144,9 @@ function getPatches() {
             addToLog('no patches returned from server');
             return;
         }
+        data.patches.sort(function (a, b) {
+            return a.title < b.title ? -1 : 1;
+        });
         addToLog(data.patches.length + " patches received from server");
         var allTags = {};
         map(function (patch) {
@@ -183,6 +186,7 @@ function getPatches() {
                     selectedTags.push(this.tag);
                 }
             });
+            var matched = 0;
             $('#patches').children().each(function (index, element) {
                 var show = true;
                 if (selectedTags.length) {
@@ -194,20 +198,24 @@ function getPatches() {
                     }
                 }
                 if (show) {
+                    matched++;
                     $(element).show();
                 } else {
                     $(element).hide();
                 }
             });
+            addToLog(matched + ' patches match');
         }
 
         $('#tags').empty();
 
+        allTags = keys(allTags);
+        allTags.sort();
         map(function (tag) {
             var element = BUTTON({ class: 'tag' }, tag);
             element.tag = tag;
             $('#tags').append($(element).click(tagClicked));
-        }, keys(allTags));
+        }, allTags);
     });
 }
 

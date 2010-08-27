@@ -48,7 +48,7 @@ div#log {
     font-size: 1.5em;
     display: inline;
 }
-.patch .author, .patch .last-modified-date, .patch .device-id, .patch .tags {
+.patch .author, .patch .last-modified-date, .patch .device-id {
     display: inline;
     padding: .2em;
     font-size: 80%;
@@ -62,12 +62,11 @@ div#log {
 .patch .device-id:before {
     content: "device-id: ";
 }
-.patch .comment {
+.patch .comment, .patch .tags {
     margin: .3em .3em .6em 1.3em;
 }
 .tag {
     display: inline;
-    float: right;
     margin: .2em;
     padding: .2em .4em .2em .4em;
     background-color: #ccc;
