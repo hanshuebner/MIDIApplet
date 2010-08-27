@@ -169,14 +169,44 @@ function getPatches() {
                     })
                     .click(patchDetails));
         }, data.patches);
+
+        function tagClicked(event) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            $(this).toggleClass('selectedTag');
+
+            var selectedTags = [];
+            $(this).parent().find('.tag').each(function (index, element) {
+                if ($(element).hasClass('selectedTag')) {
+                    selectedTags.push(this.tag);
+                }
+            });
+            $('#patches').children().each(function (index, element) {
+                var show = true;
+                if (selectedTags.length) {
+                    for (var i in selectedTags) {
+                        if (findValue(element.patch.tags || [], selectedTags[i]) == -1) {
+                            show = false
+                            break;
+                        }
+                    }
+                }
+                if (show) {
+                    $(element).show();
+                } else {
+                    $(element).hide();
+                }
+            });
+        }
+
+        $('#tags').empty();
+
         map(function (tag) {
-            var element = BUTTON({ class: 'tag selectedTag' }, tag);
+            var element = BUTTON({ class: 'tag' }, tag);
             element.tag = tag;
-            $('#tags').append(
-                $(element)
-                    .click(function () {
-                        addToLog('tag ' + this.tag + ' clicked');
-                    }));
+            $('#tags').append($(element).click(tagClicked));
         }, keys(allTags));
     });
 }
