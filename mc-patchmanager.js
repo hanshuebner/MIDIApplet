@@ -133,7 +133,7 @@ function midiMessageReceived(message) {
 
                      /^f0 00 13 41 10/, function () {
                          document.firmware = [];
-                         addToLog('NAK received from boot loader, upload aborted');
+                         addToLog('NAK received from boot loader, update not successful');
                      },
 
                      /(.*)/, function (message) {
