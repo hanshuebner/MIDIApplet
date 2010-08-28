@@ -150,9 +150,11 @@ function getPatches() {
         addToLog(data.patches.length + " patches received from server");
         var allTags = {};
         map(function (patch) {
+            /* keep track of the tags that we have, for the tag list */
             map(function (tag) {
                 allTags[tag]++;
             }, patch.tags || []);
+            /* display entry for this patch in the patch list */
             function displayField(name) {
                 return DIV({ class: name }, patch[name]);
             }
@@ -161,6 +163,7 @@ function getPatches() {
                               DIV({ class: 'tags' },
                                   map(partial(BUTTON, { class: 'tag' }), patch.tags || [])),
                               displayField('comment'));
+            /* back pointer for click handler */
             element.patch = patch;
             $('#patches').append(
                 $(element)
@@ -180,6 +183,7 @@ function getPatches() {
 
             $(this).toggleClass('selectedTag');
 
+            /* hide all patches in the patch list that do not have the selected tags */
             var selectedTags = [];
             $(this).parent().find('.tag').each(function (index, element) {
                 if ($(element).hasClass('selectedTag')) {
@@ -207,6 +211,7 @@ function getPatches() {
             addToLog(matched + ' patches match');
         }
 
+        /* create the tag list for searches */
         $('#tags').empty();
 
         allTags = keys(allTags);
@@ -221,10 +226,12 @@ function getPatches() {
 
 function uploadPatch()
 {
+    /* find the patch that we're currently displaying */
     var patch = $(this).parent().parent().parent()[0].patch;
-    addToLog('uploading patchwith id ' + patch.id);
+    addToLog('uploading patch with ' + patch.title);
     try {
         uploadFirmware(patch['hex-data']);
+        addToLog('patch uploaded');
     }
     catch (e) {
         addToLog('error uploading firmware: ' + e);
@@ -237,6 +244,7 @@ function patchDetails(event)
         event.preventDefault();
     }
 
+    /* mask out the background */
     $('#ajax-loader')
         .css('top',  $(window).height() / 2 - $('#ajax-loader').height() / 2)
         .css('left', $(window).width() / 2 - $('#ajax-loader').width() / 2);
@@ -250,10 +258,12 @@ function patchDetails(event)
         .fadeIn(200)
         .fadeTo("slow", 0.8);
 
+    /* get and display the patch details */
     $.get('/patches/' + this.patch.id, function (data) {
         var patch = evalJSON(data);
 
         if (patch.documentation) {
+            /* set up documentation window */
             $('#show-documentation')
                 .show()
                 .click(function () {
@@ -267,10 +277,12 @@ function patchDetails(event)
                         .show();
                 });
         } else {
+            /* no docs, hide documentation button */
             $('#show-documentation')
                 .hide();
         }
-        
+
+        /* display patch details */
         function displayField(name) {
             return DIV({ class: name },
                        patch[name]);
@@ -295,6 +307,7 @@ $(document).ready(function () {
 
     initMidiPortSelectors('inputSelect', 'outputSelect', applet, 'midiMessageReceived');
 
+    /* connect the MIDI port selectors and the upload button (no upload possible until ports have been selected */
     function maybeEnableUpload() {
         $('#upload-button').attr('disabled',
                                  ($('#inputSelect').val() && $('#outputSelect').val()) ? '' : 'disabled');
@@ -304,6 +317,7 @@ $(document).ready(function () {
     $('#outputSelect').change(maybeEnableUpload);
     $('#upload-button').click(uploadPatch);
 
+    /* initialize close icons of modal windows */
     $('.close-window-icon').click(function () {
         $(this).parent().fadeOut(100);
         if ($(this).parent().attr('top')) {
