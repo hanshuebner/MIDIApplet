@@ -161,7 +161,7 @@ function getPatches() {
             var element = DIV({ class: 'patch' },
                               map(displayField, ['title', 'author', 'last-modified-date']),
                               DIV({ class: 'tags' },
-                                  map(partial(BUTTON, { class: 'tag' }), patch.tags || [])),
+                                  map(partial(DIV, { class: 'tag' }), patch.tags || [])),
                               displayField('comment'));
             /* back pointer for click handler */
             element.patch = patch;

@@ -70,6 +70,7 @@ div#log {
     margin: .2em;
     padding: .2em .4em .2em .4em;
     background-color: #ccc;
+    font-size: 80%;
 }
 .selectedTag {
     background-color: #cff;
